@@ -1,1 +1,36 @@
+
+
 services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_HOST=mariadb
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=example
+      - DATABASE_NAME=voting_app
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=example
+      - MYSQL_DATABASE=voting_app
+    ports:
+      - "3306:3306"
+
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mariadb
