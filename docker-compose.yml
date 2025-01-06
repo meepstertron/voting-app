@@ -2,9 +2,9 @@
 
 services:
   frontend:
-    build: ./frontend
+    build: ./frontend/voting-app
     ports:
-      - "3000:3000"
+      - "3000:80"
     depends_on:
       - backend
 

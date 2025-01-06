@@ -21,8 +21,8 @@ USER flaskuser
 EXPOSE 5000
 
 # Use environment variables for configuration
-ENV FLASK_APP=app.py
+ENV FLASK_APP=main.py
 ENV FLASK_DEBUG=0
 
 # Use Gunicorn to serve the app
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "main:app"]
