@@ -2,3 +2,4 @@ flask
 gunicorn==20.1.0
 flask-cors  
 flask-sqlalchemy
+pymysql

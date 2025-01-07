@@ -1,15 +1,21 @@
-import { Button } from "./components/ui/button"
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Vote from './vote';
+import Editor from './Editor';
+import { Toaster } from "@/components/ui/toaster";
 
-
+const Home = () => <h1>Home</h1>;
 
 function App() {
-
   return (
-    <>
-    bruh
-    <Button>bruhv init</Button>
-    </>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/vote/:pollid" element={<Vote />} />
+        <Route path='/editor' element={<Editor />} />
+      </Routes>
+      <Toaster />
+    </Router>
+  );
 }
 
-export default App
+export default App;
