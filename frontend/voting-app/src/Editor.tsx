@@ -47,6 +47,20 @@ function Editor() {
               })
             invalid = true;
         }
+        if (selectedTime === 0) {
+            toast({
+                title: "Invalid expiry time",
+                description: "The poll expiry time cannot be zero.",
+              })
+            invalid = true;
+        }
+        if (background === "") {
+            toast({
+                title: "Select background",
+                description: "Please select a background for the poll.",
+              })
+            invalid = true;
+        }
         if (invalid) return;
         console.log(questions);
         console.log(pollTitle);
