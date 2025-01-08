@@ -28,6 +28,7 @@ import { Helmet } from 'react-helmet';
 import { useState, useEffect } from 'react';
 import { Separator } from './components/ui/separator';
 import { Button } from './components/ui/button';
+import { CircleCheckBig } from "lucide-react";
 
 
 const FormSchema = z.object({
@@ -42,6 +43,19 @@ function Vote() {
       })
       
     function onSubmit(data: z.infer<typeof FormSchema>) {
+        $.ajax({
+            url: `${config.apiUrl}/api/poll/${pollid}/vote`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                pollid: window.location.pathname.split('/').pop(),
+                option: data.option.split("-")[0],
+                uuid: localStorage.getItem('uuid')
+            }),
+            success: () => {
+                setPoll(prevPoll => ({ ...prevPoll, hasVoted: true }));
+            }
+        });
     console.log(data);
     }
 
@@ -50,6 +64,8 @@ function Vote() {
         options: [],
         end: '',
         hasEnded: false,
+        background: "" as "paint" | "gradient" | "none",
+        hasVoted: false,
     });
     const [timeRemaining, setTimeRemaining] = useState('');
 
@@ -70,6 +86,8 @@ function Vote() {
                     options: data.options,
                     end: data.end,
                     hasEnded: now > targetTime,
+                    background: data.background,
+                    hasVoted: data.hasVoted,
                 });
                 setTimeRemaining(formatTimeRemaining(data.end));
             }
@@ -113,73 +131,107 @@ function Vote() {
             .map(part => `${part.value} ${part.label}${part.value > 1 ? 's' : ''}`)
             .join(', ');
     }
+    if (!poll.hasVoted) {
+        return ( 
+            <> 
+                <Helmet>
+                    <title>Voting App | Cast your vote</title>
+                    <meta property="og:title" content="You have been invited to vote on this poll" />
+                </Helmet>
+                <div className="flex flex-col justify-center items-center min-h-screen height-full relative">
+                    <ProceduralBackground type= {poll.background}/>
+                    <div className="absolute inset-0 flex flex-col justify-center items-center">
+                    <h1 className="mb-4 w-full sm:w-3/5 md:w-2/5 text-left text-xl bg-white p-3 rounded-md bg-opacity-50">You have been invited to vote on this poll:</h1>
+                    <Card className='w-full sm:w-3/5 md:w-2/5 p-4 '>
+                        <CardHeader>
+                        <CardTitle>{poll.question}</CardTitle>
+                        <CardDescription>Please select one of the following</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="">
+                                <FormField
+                                    control={form.control}
+                                    name="option"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel></FormLabel>
+                                            <FormControl>
+                                                <RadioGroup onValueChange={field.onChange} className="mb-3" defaultValue="none">
+                                                    <FormItem>
+                                                        {poll.options.map((option, index) => (
+                                                        <div key={index} className="flex items-center space-x-2">
+                                                            <FormControl>
+                                                                <RadioGroupItem value={option + "-" + index} id={"option-" + index} disabled={poll.hasEnded} />
+                                                            </FormControl>
+                                                            <FormLabel>{option}</FormLabel>
+                                                        </div>))}
+                                                    </FormItem>
+                                                </RadioGroup>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                    />
 
-    return ( 
-        <> 
-            <Helmet>
-                <title>Voting App | Cast your vote</title>
-                <meta property="og:title" content="You have been invited to vote on this poll" />
-            </Helmet>
-            <div className="flex flex-col justify-center items-center min-h-screen height-full relative">
-                <ProceduralBackground type="gradient"/>
-                <div className="absolute inset-0 flex flex-col justify-center items-center">
-                <h1 className="mb-4 w-full sm:w-3/5 md:w-2/5 text-left text-xl bg-white p-3 rounded-md bg-opacity-50">You have been invited to vote on this poll:</h1>
-                <Card className='w-full sm:w-3/5 md:w-2/5 p-4 '>
-                    <CardHeader>
-                    <CardTitle>{poll.question}</CardTitle>
-                    <CardDescription>Please select one of the following</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="">
-                            <FormField
-                                control={form.control}
-                                name="option"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel></FormLabel>
-                                        <FormControl>
-                                            <RadioGroup onValueChange={field.onChange} className="mb-3" defaultValue="none">
-                                                <FormItem>
-                                                    {poll.options.map((option, index) => (
-                                                    <div key={index} className="flex items-center space-x-2">
-                                                        <FormControl>
-                                                            <RadioGroupItem value={"option-" + index} id={"option-" + index} disabled={poll.hasEnded} />
-                                                        </FormControl>
-                                                        <FormLabel>{option}</FormLabel>
-                                                    </div>))}
-                                                </FormItem>
-                                            </RadioGroup>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-
-                            <Separator className='mt-3 mb-3'/>
-                            <Button type="submit" disabled={poll.hasEnded}>Submit</Button>
-                        </form>
-                    </Form>
-                    </CardContent>
-                    <CardFooter>
-                        {poll.end ? (
-                            poll.hasEnded ? (
-                                <p className='text-muted-foreground text-xs'>This poll has ended</p>
+                                <Separator className='mt-3 mb-3'/>
+                                <Button type="submit" disabled={poll.hasEnded}>Submit</Button>
+                            </form>
+                        </Form>
+                        </CardContent>
+                        <CardFooter>
+                            {poll.end ? (
+                                poll.hasEnded ? (
+                                    <p className='text-muted-foreground text-xs'>This poll has ended</p>
+                                ) : (
+                                    <p className='text-muted-foreground text-xs'>This poll will expire in: {timeRemaining}</p>
+                                )
                             ) : (
-                                <p className='text-muted-foreground text-xs'>This poll will expire in: {timeRemaining}</p>
-                            )
-                        ) : (
-                            <p className='text-muted-foreground text-xs'>This poll does not expire</p>
-                        )}
-                    </CardFooter>
-                </Card>
+                                <p className='text-muted-foreground text-xs'>This poll does not expire</p>
+                            )}
+                        </CardFooter>
+                    </Card>
+                    </div>
+                    <footer className="absolute bottom-0 w-full text-center p-4 bg-white bg-opacity-50 text-muted-foreground">
+                        Created using <a className='underline' href="https://github.com/meepstertron/voting-app">votingApp</a>, an opensource live poll creator!
+                    </footer>
                 </div>
-                <footer className="absolute bottom-0 w-full text-center p-4 bg-white bg-opacity-50 text-muted-foreground">
-                    Created using <a className='underline' href="https://github.com/meepstertron/voting-app">votingApp</a>, an opensource live poll creator!
-                </footer>
-            </div>
-        </>
-     );
+            </>
+        );}
+    else {
+        return ( 
+            <> 
+                <Helmet>
+                    <title>Voting App | Cast your vote</title>
+                    <meta property="og:title" content="You have been invited to vote on this poll" />
+                </Helmet>
+                <div className="flex flex-col justify-center items-center min-h-screen height-full relative">
+                    <ProceduralBackground type= {poll.background}/>
+                    <div className="absolute inset-0 flex flex-col justify-center items-center">
+                    
+                    <Card className='w-full sm:w-3/5 md:w-2/5 p-4 '>
+                        <CardHeader>
+                        <CardTitle>{poll.question}</CardTitle>
+
+                        </CardHeader>
+                        <CardContent className="flex flex-col justify-center items-center">
+                            <CircleCheckBig className="text-foreground" size={64}/>
+                            <p className="mt-4">Thank you for voting on this poll!</p>
+                        </CardContent>
+                        <CardFooter>
+                            <p className="text-muted-foreground text-xs">You have already voted for this poll!</p>
+
+                        </CardFooter>
+                    </Card>
+                    </div>
+                    <footer className="absolute bottom-0 w-full text-center p-4 bg-white bg-opacity-50 text-muted-foreground">
+                        Created using <a className='underline' href="https://github.com/meepstertron/voting-app">votingApp</a>, an opensource live poll creator!
+                    </footer>
+                </div>
+            </>
+        );
+    }
+
 }
 
 export default Vote;

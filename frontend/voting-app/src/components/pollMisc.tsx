@@ -26,7 +26,7 @@ function PollSettings({ allowMultipleVotes, setAllowMultipleVotes, background, s
             <div className="flex flex-col space-y-2">
                 <div className="flex items-center space-x-2 mb-2">
                     <Switch onClick={() => setAllowMultipleVotes(!allowMultipleVotes)} id="allow-multiple-votes" checked={allowMultipleVotes} />
-                    <Label htmlFor="allow-multiple-votes">Allow multiple votes per user <br /> <span className="text-muted-foreground font-normal text-xs">This could make results invalid</span></Label>
+                    <Label htmlFor="allow-multiple-votes">Allow multiple entries per user <br /> <span className="text-muted-foreground font-normal text-xs">This could make results invalid</span></Label>
                 </div>
                 <Select onValueChange={setBackground} value={background}>
                     <SelectTrigger className="w-[180px]">

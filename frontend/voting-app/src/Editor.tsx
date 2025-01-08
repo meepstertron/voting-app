@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 
+import $ from 'jquery';
+import config from './config';
 
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -61,9 +63,35 @@ function Editor() {
               })
             invalid = true;
         }
+        if (questions.some((question) => question === "")) {
+            toast({
+                title: "Empty question",
+                description: "One or more questions are empty. please fill them.",
+              })
+            invalid = true;
+        }
         if (invalid) return;
-        console.log(questions);
-        console.log(pollTitle);
+        const poll = {
+            title: pollTitle,
+            questions: questions,
+            expiry: selectedTime,
+            allowMultipleVotes: allowMultipleVotes,
+            background: background,
+        };
+
+        $.ajax({
+            url: `${config.apiUrl}/api/poll`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(poll),
+            success: (data) => {
+                toast({
+                    title: "Poll published",
+                    description: "Your poll has been published successfully. Redirecting you to the poll page.",
+                  })
+                location.href = `/poll/${data.id}`;
+            }
+        });
     }
 
   return (
