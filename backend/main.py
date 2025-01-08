@@ -74,6 +74,22 @@ def vote(poll_id):
     
     return jsonify({"message": "Vote received"}), 200
 
+@app.route('/api/poll/<poll_id>/results', methods=['GET'])
+def results(poll_id):
+    with app.app_context():
+        poll = Poll.query.filter_by(id=poll_id).first()
+        if not poll:
+            return jsonify({"error": "Poll not found"}), 404
+
+        
+        return({
+            "question": poll.question,
+            "options": poll.awnsers,
+            "background": poll.background
+        }), 200
+
+    
+
 
 app.register_blueprint(main_blueprint)
 
