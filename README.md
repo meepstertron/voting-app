@@ -1,4 +1,4 @@
-![Banner](https://github.com/meepstertron/votingApp/votingapp-banner.png?raw=true)
+![Banner](https://github.com/meepstertron/voting-app/blob/main/votingapp-banner.png?raw=true)
 
 # Voting App
 
