@@ -1,6 +1,6 @@
 # Voting App
 
-Welcome to the Voting App! This project is designed to provide a simple and efficient way to create and manage polls.
+Welcome to the Voting App! This project is designed to provide a simple and efficient way to create and share polls.
 
 
 ## Features
@@ -26,6 +26,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Contact
 
-For any questions or suggestions, please open an issue or contact us at [email@example.com](mailto:email@example.com).
+For any questions or suggestions, please open an issue or contact me at [meepstertron@gmail.com](mailto:meepstertron@gmail.com).
 
 Happy Voting!
