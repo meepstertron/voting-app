@@ -5,7 +5,7 @@ interface Config {
 }
 
 const config: Config = {
-    apiUrl: 'http://localhost:5000'
+    apiUrl: 'https://api.votingapp.development.hexagonical.ch/'
 };
 
 export default config;

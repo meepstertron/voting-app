@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import ProceduralBackground from "./background"
@@ -19,14 +19,14 @@ interface PollData {
     question: string;
     options: PollOption[];
     hasEnded: boolean;
-    background: string;
+    background: "none" | "paint" | "gradient";
 }
 
 interface FetchPollResultsResponse {
     question: string;
     options: { [key: string]: number };
     hasEnded: boolean;
-    background: string;
+    background: "none" | "paint" | "gradient";
 }
 
 function fetchPollResults(setPollData: React.Dispatch<React.SetStateAction<PollData>>): void {
@@ -59,6 +59,7 @@ const initialPollData: PollData = {
   question: "Loading Data...",
   options: [],
   hasEnded: false,
+  background: "none",
 }
 
 const Poll = () => {
@@ -86,7 +87,7 @@ const Poll = () => {
     return () => clearInterval(interval);
   }, [pollData.hasEnded]);
 
-
+  let voteat = window.location.href.replace("poll", "vote");
   return (
     <>
       <ProceduralBackground type={pollData.background} />
@@ -138,6 +139,9 @@ const Poll = () => {
               </div>
             </div>
           </CardContent>
+          <CardFooter className="text-muted-foreground text-xs">
+            <p>Vote on this poll at <a className="underline" href={voteat}>{voteat}</a></p>
+          </CardFooter>
         </Card>
       </div>
     </>

@@ -47,14 +47,14 @@ def poll():
         if not poll:
             return jsonify({"error": "Poll not found"}), 404
 
-        options = sorted(poll.answers, key=poll.answers.get)
+        options = [key for key, value in sorted(json.loads(poll.answers).items(), key=lambda x: x[1])]
         
         connection.close()
         return jsonify({
             "question": poll.question,
             "options": options,
             "end": poll.end_timestamp,
-            "hasVoted": body.get("uuid") in poll.uuids,
+            "hasVoted": body.get("uuid") in json.loads(poll.uuids),
             "background": poll.background
         }), 200
         
@@ -94,16 +94,25 @@ def vote(poll_id):
     if not poll:
         return jsonify({"error": "Poll not found"}), 404
 
-    if poll.check_uuid and body["uuid"] in poll.uuids:
+    poll_answers = json.loads(poll.answers)
+    poll_uuids = json.loads(poll.uuids)
+
+    if poll.check_uuid and body["uuid"] in poll_uuids:
         return jsonify({"error": "User has already voted"}), 403
     
-    if body["option"] not in poll.answers:
+    if body["option"] not in poll_answers:
         return jsonify({"error": "Option not found"}), 404
 
-    connection.execute(text("UPDATE polls SET answers = JSON_SET(answers, :option, JSON_EXTRACT(answers, :option) + 1) WHERE id = :id"), {'option': f'$.{body["option"]}', 'id': poll_id})
-    
+    poll_answers[body["option"]] += 1
+
     if poll.check_uuid:
-        connection.execute(text("UPDATE polls SET uuids = JSON_ARRAY_APPEND(uuids, '$', :uuid) WHERE id = :id"), {'uuid': body["uuid"], 'id': poll_id})
+        poll_uuids.append(body["uuid"])
+
+    connection.execute(text("UPDATE polls SET answers = :answers, uuids = :uuids WHERE id = :id"), {
+        'answers': json.dumps(poll_answers),
+        'uuids': json.dumps(poll_uuids),
+        'id': poll_id
+    })
     
     connection.commit()
     connection.close()
@@ -119,7 +128,7 @@ def results(poll_id):
 
     return({
         "question": poll.question,
-        "options": poll.answers,
+        "options": json.loads(poll.answers),
         "background": poll.background
     }), 200
 
