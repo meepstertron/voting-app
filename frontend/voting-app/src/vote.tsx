@@ -66,6 +66,7 @@ function Vote() {
         hasEnded: false,
         background: "" as "paint" | "gradient" | "none",
         hasVoted: false,
+        firstVote: true,
     });
     const [timeRemaining, setTimeRemaining] = useState('');
 
@@ -88,6 +89,7 @@ function Vote() {
                     hasEnded: now > targetTime,
                     background: data.background,
                     hasVoted: data.hasVoted,
+                    firstVote: !data.hasVoted,
                 });
                 setTimeRemaining(formatTimeRemaining(data.end));
             }
@@ -219,8 +221,8 @@ function Vote() {
                             <p className="mt-4">Thank you for voting on this poll!</p>
                         </CardContent>
                         <CardFooter>
-                            <p className="text-muted-foreground text-xs">You have already voted for this poll!</p>
-
+                            {poll.firstVote ? <p className="text-muted-foreground text-xs hidden">This is your first vote!</p> : <p className="text-muted-foreground text-xs">You have already voted for this poll!</p>}
+                            
                         </CardFooter>
                     </Card>
                     </div>

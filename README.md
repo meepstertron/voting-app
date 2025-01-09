@@ -1,3 +1,5 @@
+![Banner](https://github.com/meepstertron/votingApp/votingapp-banner.png?raw=true)
+
 # Voting App
 
 Welcome to the Voting App! This project is designed to provide a simple and efficient way to create and share polls.
